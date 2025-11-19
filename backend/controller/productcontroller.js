@@ -1,8 +1,8 @@
 // import Product from '../models/productModel.js';
 // import HandleError from "../utils/handleError.js";
 
-// // Creating Products
-// export const createProducts = async (req, res) => {
+// // Create Product
+// export const createProducts = async (req, res, next) => {
 //   try {
 //     const newProduct = await Product.create(req.body);
 //     res.status(201).json({
@@ -10,15 +10,12 @@
 //       product: newProduct,
 //     });
 //   } catch (error) {
-//     res.status(500).json({
-//       success: false,
-//       message: error.message,
-//     });
+//     next(error); // Pass error to global handler
 //   }
 // };
 
 // // Get All Products
-// export const getAllProducts = async (req, res) => {
+// export const getAllProducts = async (req, res, next) => {
 //   try {
 //     const products = await Product.find();
 //     res.status(200).json({
@@ -26,34 +23,23 @@
 //       products,
 //     });
 //   } catch (error) {
-//     res.status(500).json({
-//       success: false,
-//       message: error.message,
-//     });
+//     next(error);
 //   }
 // };
 
-
-// //update Product
+// // Update Product
 // export const updateProduct = async (req, res, next) => {
 //   try {
 //     let product = await Product.findById(req.params.id);
 
 //     if (!product) {
-//       return res.status(404).json({
-//         success: false,
-//         message: "Product not found",
-//       });
+//       return next(new HandleError("Product not found", 404));
 //     }
 
-//     product = await Product.findByIdAndUpdate(
-//       req.params.id,
-//       req.body,
-//       {
-//         new: true,          // returns updated document
-//         runValidators: true // validates data before saving
-//       }
-//     );
+//     product = await Product.findByIdAndUpdate(req.params.id, req.body, {
+//       new: true,
+//       runValidators: true,
+//     });
 
 //     res.status(200).json({
 //       success: true,
@@ -61,99 +47,136 @@
 //     });
 
 //   } catch (error) {
-//     res.status(500).json({
-//       success: false,
-//       message: error.message,
-//     });
+//     next(error);
 //   }
 // };
 
-// //Delete Product
-
-// export const deleteProduct = async (req, res)=>{
+// // Delete Product
+// export const deleteProduct = async (req, res, next) => {
 //   try {
+//     let product = await Product.findById(req.params.id);
 
-//   let product = await Product.findById(req.params.id);
 //     if (!product) {
-//       return res.status(404).json({
-//         success: false,
-//         message: "Product not found",
-//       });
+//       return next(new HandleError("Product not found", 404));
 //     }
-//     product = await Product.findByIdAndDelete(req.params.id)
-//      res.status(200).json({
-//       success: true,
-//       message:"Product Deleted Successfully"
-//     });
 
-//       } catch (error) {
-//     res.status(500).json({
-//       success: false,
-//       message: error.message,
-//     });
-//   }
-// }
+//     await Product.findByIdAndDelete(req.params.id);
 
-// //Accessing Single Product
-
-// export const getSingleProduct = async (req, res)=>{
-//   const product = await Product.findById(req.params.id)
-
-//   if (!product) {
-//       return res.status(404).json({
-//         success: false,
-//         message: "Product not found",
-//       });
-//     }
 //     res.status(200).json({
-//       success:true,
-//       product
-//     })
-// }
+//       success: true,
+//       message: "Product deleted successfully",
+//     });
+
+//   } catch (error) {
+//     next(error);
+//   }
+// };
+
+// // Get Single Product
+// export const getSingleProduct = async (req, res, next) => {
+//   try {
+//     const product = await Product.findById(req.params.id);
+
+//     if (!product) {
+//       return next(new HandleError("Product not found", 404));
+//     }
+
+//     res.status(200).json({
+//       success: true,
+//       product,
+//     });
+
+//   } catch (error) {
+//     next(error);
+//   }
+// };
 
 
 
 
+import Product from "../models/productModel.js";
+import APIFunctionality from "../utils/apiFunctionality.js";
 
 
 
 
-import Product from '../models/productModel.js';
-import HandleError from "../utils/handleError.js";
+// http://127.0.0.1:8000/api/v1/product/691220e06a4653a649af2ead?keyword=shirt
 
 // Create Product
-export const createProducts = async (req, res, next) => {
+export const createProducts = async (req, res) => {
   try {
     const newProduct = await Product.create(req.body);
-    res.status(201).json({
+
+    return res.status(201).json({
       success: true,
       product: newProduct,
     });
+
   } catch (error) {
-    next(error); // Pass error to global handler
+    return res.status(400).json({
+      success: false,
+      message: error.message,
+    });
   }
 };
 
 // Get All Products
-export const getAllProducts = async (req, res, next) => {
+export const getAllProducts = async (req, res) => {
+  const resultPerPage=3;
   try {
-    const products = await Product.find();
-    res.status(200).json({
+    const apiFunctionality = new APIFunctionality(Product.find(), req.query).search().filter().pagination(resultPerPage)
+
+    
+
+  const products = await apiFunctionality.query
+    return res.status(200).json({
       success: true,
       products,
     });
+
   } catch (error) {
-    next(error);
+    return res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
+// Get Single Product
+export const getSingleProduct = async (req, res) => {
+  try {
+    const product = await Product.findById(req.params.id);
+
+    if (!product) {
+      return res.status(404).json({
+        success: false,
+        message: "Product not found",
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      product,
+    });
+
+  } catch (error) {
+    return res.status(400).json({
+      success: false,
+      message: "Invalid product ID",
+    });
   }
 };
 
 // Update Product
-export const updateProduct = async (req, res, next) => {
+export const updateProduct = async (req, res) => {
   try {
     let product = await Product.findById(req.params.id);
 
     if (!product) {
-      return next(new HandleError("Product not found", 404));
+      return res.status(404).json({
+        success: false,
+        message: "Product not found",
+      });
     }
 
     product = await Product.findByIdAndUpdate(req.params.id, req.body, {
@@ -161,55 +184,46 @@ export const updateProduct = async (req, res, next) => {
       runValidators: true,
     });
 
-    res.status(200).json({
+    return res.status(200).json({
       success: true,
       product,
     });
 
   } catch (error) {
-    next(error);
+    return res.status(400).json({
+      success: false,
+      message: error.message,
+    });
   }
 };
 
 // Delete Product
-export const deleteProduct = async (req, res, next) => {
+export const deleteProduct = async (req, res) => {
   try {
     let product = await Product.findById(req.params.id);
 
     if (!product) {
-      return next(new HandleError("Product not found", 404));
+      return res.status(404).json({
+        success: false,
+        message: "Product not found",
+      });
     }
 
     await Product.findByIdAndDelete(req.params.id);
 
-    res.status(200).json({
+    return res.status(200).json({
       success: true,
       message: "Product deleted successfully",
     });
 
   } catch (error) {
-    next(error);
-  }
-};
-
-// Get Single Product
-export const getSingleProduct = async (req, res, next) => {
-  try {
-    const product = await Product.findById(req.params.id);
-
-    if (!product) {
-      return next(new HandleError("Product not found", 404));
-    }
-
-    res.status(200).json({
-      success: true,
-      product,
+    return res.status(400).json({
+      success: false,
+      message: "Invalid product ID",
     });
-
-  } catch (error) {
-    next(error);
   }
 };
+
 
 
 
