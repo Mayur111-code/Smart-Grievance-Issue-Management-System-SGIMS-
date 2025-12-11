@@ -16,7 +16,7 @@ export default function ProtectedRoute({ children, role }) {
     // redirect to their home page based on role
     if (userRole === "admin") return <Navigate to="/admin/dashboard" replace />;
     if (userRole === "department") return <Navigate to="/officer/dashboard" replace />;
-    return <Navigate to="/home" replace />;
+    return <Navigate to="/" replace />;
   }
 
   return children;

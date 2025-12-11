@@ -18,6 +18,10 @@ import OfficerDashboard from "./pages/OfficerDashboard";
 import OfficerComplaintDetails from "./pages/OfficerComplaintDetails";
 
 import ProtectedRoute from "./components/ProtectedRoute";
+import Support from "./pages/Support";
+import AdminProfile from "./pages/AdminProfile";
+import OfficerProfile from "./pages/OfficerProfile";
+import UserProfile from "./pages/UserProfile";
 
 function App() {
   return (
@@ -28,11 +32,11 @@ function App() {
 
       <Routes>
         {/* PUBLIC ROUTES */}
-        <Route path="/" element={<Login />} />
+        <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
 
         {/* USER ROUTES */}
-        <Route path="/home" element={<Home />} />
+        <Route path="/" element={<Home />} />
         <Route path="/my-complaints" element={<MyComplaints />} />
         <Route path="/complaint/new" element={<ComplaintForm />} />
         <Route path="/complaint/:id" element={<ComplaintDetails />} />
@@ -75,6 +79,12 @@ function App() {
             </ProtectedRoute>
           }
         />
+        <Route path="/support" element={<Support />} />
+
+<Route path="/profile/user" element={<UserProfile />} />
+<Route path="/profile/officer" element={<OfficerProfile />} />
+<Route path="/profile/admin" element={<AdminProfile />} />
+
       </Routes>
     </BrowserRouter>
   );
