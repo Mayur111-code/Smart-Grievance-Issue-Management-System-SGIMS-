@@ -56,7 +56,7 @@ connectDB();
 
 // CORS FIX FOR FRONTEND (VERY IMPORTANT)
 app.use(cors({
-  origin: "http://localhost:5173",   // frontend url
+  origin: "https://sgims.vercel.app/" || "http://localhost:5173",   // frontend url
   credentials: true,                 // allow cookies/JWT
   methods: "GET,POST,PUT,DELETE",
   allowedHeaders: "Content-Type,Authorization"
@@ -78,8 +78,7 @@ app.get("/", (req, res) => res.send("SGIMS Backend Running Successfully!"));
 
 // START SERVER
 const PORT = process.env.PORT || 5000;
-const HOST = "127.0.0.1";
 
-app.listen(PORT, HOST, () =>
-  console.log(`Backend running at ➜ http://${HOST}:${PORT}`)
-);
+app.listen(PORT, () => {
+  console.log(`Backend running on port ${PORT}`);
+});

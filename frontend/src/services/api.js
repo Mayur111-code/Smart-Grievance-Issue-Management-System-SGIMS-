@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const API = axios.create({
-  baseURL: "http://127.0.0.1:5000/api",
+  baseURL: "https://sgims-backend.onrender.com/" || "http://127.0.0.1:5000/api",
 });
 
 // Always attach token
