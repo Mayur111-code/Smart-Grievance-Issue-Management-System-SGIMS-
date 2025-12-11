@@ -63,8 +63,9 @@ app.use(cors({
 }));
 
 // Body parser
-app.use(bodyParser.json({ limit: "10mb" }));
-app.use(bodyParser.urlencoded({ extended: true }));
+app.use(express.json({ limit: "10mb" }));
+app.use(express.urlencoded({ extended: true }));
+
 
 // ROUTES
 app.use("/api/auth", authRoutes);
